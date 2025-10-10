@@ -1,0 +1,52 @@
+package org.example.handsome.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity // 启用 Spring Security 配置
+public class SecurityConfig {
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeHttpRequests(auth -> auth
+                                // 放行不需要认证的接口
+                                .requestMatchers("/user/send", "/user/login", "/user/logout").permitAll()
+                                .requestMatchers("/student/**").hasAuthority("student")
+                                .requestMatchers("/admin/**").hasAuthority("admin")
+// 其他接口需认证
+                                .anyRequest().authenticated()
+                )
+                // 添加登出配置
+                .logout(logout -> logout
+                        .logoutUrl("/user/logout")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            // 自定义登出成功响应
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"code\":200,\"msg\":\"登出成功\"}");
+                        })
+                )
+                .sessionManagement(session -> session
+                                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                )
+                // 关闭 CSRF
+                .csrf(csrf -> csrf.disable());
+        return http.build();
+    }
+
+}
+

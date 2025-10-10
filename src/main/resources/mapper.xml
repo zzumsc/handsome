@@ -1,0 +1,79 @@
+<!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.example.handsome.dao.UserDao">
+
+    &lt;!&ndash; 新增用户 &ndash;&gt;
+    <insert id="insert" parameterType="org.example.handsome.pojo.User">
+        INSERT INTO users (email, name, role, no)
+        VALUES (#{email}, #{name}, #{role}, #{no})
+    </insert>
+
+    &lt;!&ndash; 根据ID删除 &ndash;&gt;
+    <delete id="deleteById" parameterType="java.lang.Long">
+        DELETE FROM users WHERE id = #{id}
+    </delete>
+
+    &lt;!&ndash; 更新用户 &ndash;&gt;
+    <update id="update" parameterType="org.example.handsome.pojo.User">
+        UPDATE users
+        <set>
+            <if test="email != null">email = #{email},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="role != null">role = #{role},</if>
+            <if test="no != null">no = #{no}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    &lt;!&ndash; 根据ID查询 &ndash;&gt;
+    <select id="selectById" parameterType="java.lang.Long" resultType="org.example.handsome.pojo.User">
+        SELECT id, email, name, role, no FROM users WHERE id = #{id}
+    </select>
+
+    &lt;!&ndash; 根据邮箱查询用户 &ndash;&gt;
+    <select id="selectByEmail" parameterType="java.lang.String" resultType="org.example.handsome.pojo.User">
+        SELECT id, email, name, role, no FROM users WHERE email = #{email}
+    </select>
+
+    &lt;!&ndash; 多条件查询（核心） &ndash;&gt;
+    <select id="selectByCondition" parameterType="org.example.handsome.pojo.UserQuery" resultType="org.example.handsome.pojo.User">
+        SELECT id, email, name, role, no FROM users
+        <where>
+            &lt;!&ndash; 学号/工号：部分匹配（如101可匹配2023101） &ndash;&gt;
+            <if test="no != null and no != ''">
+                AND no LIKE CONCAT('%', #{no}, '%')
+            </if>
+            &lt;!&ndash; 姓名：部分匹配 &ndash;&gt;
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            &lt;!&ndash; 角色：精确匹配（只能是admin或student） &ndash;&gt;
+            <if test="role != null and role != ''">
+                AND role = #{role}
+            </if>
+            &lt;!&ndash; 邮箱：部分匹配 &ndash;&gt;
+            <if test="email != null and email != ''">
+                AND email LIKE CONCAT('%', #{email}, '%')
+            </if>
+        </where>
+
+        &lt;!&ndash; 排序：支持按no/name/role排序，默认按id升序 &ndash;&gt;
+        <if test="sortField != null and sortField != ''">
+            ORDER BY
+            <choose>
+                <when test="sortField == 'no'">no</when>
+                <when test="sortField == 'name'">name</when>
+                <when test="sortField == 'role'">role</when>
+                <otherwise>id</otherwise>
+            </choose>
+            <if test="sortDir != null and sortDir == 'desc'">DESC</if>
+            <if test="sortDir == null or sortDir != 'desc'">ASC</if>
+        </if>
+        <if test="sortField == null or sortField == ''">
+            ORDER BY id ASC
+        </if>
+    </select>
+</mapper>-->
