@@ -7,6 +7,8 @@ import org.example.handsome.dao.UserDao;
 import org.example.handsome.pojo.DTO.Result;
 import org.example.handsome.pojo.User;
 import org.example.handsome.service.StudentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -72,6 +74,9 @@ public class StudentServiceImpl implements StudentService {
     @Resource
     StudentPointDao studentPointDao;
 
+    @Autowired
+    RedisTemplate<String, Object> redisTemplate;
+
     @Override
     public Result getMyPoints() {
         try{
@@ -87,7 +92,7 @@ public class StudentServiceImpl implements StudentService {
 
             // 3. 根据学生ID查询积分
             Long studentId = loginUser.getId();
-            return Result.ok("获取积分成功").put("point",studentPointDao.getStudentPoints(studentId));
+            return Result.ok("获取积分成功").put("point",studentPointDao.getStudentPoints(studentId,redisTemplate));
         }
         catch (Exception e) {
             log.error("获取学生积分失败", e);

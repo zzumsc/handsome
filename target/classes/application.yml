@@ -39,8 +39,14 @@ mybatis:
 
 logging:
   level:
-    root: INFO  # 根日志级别（INFO/DEBUG，DEBUG 更详细）
-    org.example.handsome: DEBUG  # 你的项目包路径，设置为 DEBUG 打印详细日志
-    org.springframework.security: DEBUG  # 打印 Spring Security 认证过程日志
+    root: info
+    org.example.handsome: debug
+    org.springframework.security: debug
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"  # 控制台日志格式
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+rocketmq:
+  name-server: 127.0.0.1:9876
+  producer:
+    group: course_selection_producer_group
+    retry-times-when-consume-failed: 0

@@ -19,9 +19,9 @@ public class StudentCourseController {
     }
 
     // 选课
-    @PostMapping("/{courseId}/select")
-    public Result selectCourse(@PathVariable Long courseId) {
-        return studentCourseService.selectCourse(courseId);
+    @PostMapping("/{courseId}/{studentId}/select")
+    public Result selectCourse(@PathVariable Long courseId,@PathVariable Long studentId) {
+        return studentCourseService.selectCourse(courseId,studentId);
     }
 
     // 退课

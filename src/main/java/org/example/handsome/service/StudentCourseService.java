@@ -9,7 +9,7 @@ public interface StudentCourseService {
     Result listAvailableCourses();
 
     // 选课（仅已发布课程）
-    Result selectCourse(Long courseId);
+    Result selectCourse(Long courseId, Long studentId);
 
     // 退课（返还80%积分）
     Result dropCourse(Long courseId);

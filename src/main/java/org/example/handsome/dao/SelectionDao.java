@@ -87,6 +87,9 @@ public interface SelectionDao {
             @Param("courseId") Long courseId
     );
 
+    @Select("select max_students-current_students from courses where id= #{courseId}")
+    int remainStudents(@Param("courseId")Long courseId);
+
     @Insert("INSERT INTO selections (" +
             "student_id, course_id, selection_time, points_used" +
             ") VALUES (" +

@@ -9,7 +9,6 @@ import org.example.handsome.pojo.DTO.Result;
 import org.example.handsome.pojo.Selection;
 import org.example.handsome.pojo.User;
 import org.example.handsome.service.AdminCourseService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;

@@ -85,9 +85,10 @@ public interface CourseDao {
             "</script>")
     int batchUpdateCurrentPoints(@Param("courses") List<Course> courses);
 
-    @Update("UPDATE courses SET current_students = current_students + 1, version = version + 1 " +
-            "WHERE id = #{courseId} AND current_students < max_students AND version = #{version}")
-    int incrementStudentCount(@Param("courseId") Long courseId, @Param("version") Integer version);
+    //乐观锁修改
+    @Update("UPDATE courses SET current_students = current_students + 1 " +
+            "WHERE id = #{courseId} AND current_students < max_students")
+    int incrementStudentCount(@Param("courseId") Long courseId);
 
     @Select("<script>"+
             "SELECT * FROM courses " +
