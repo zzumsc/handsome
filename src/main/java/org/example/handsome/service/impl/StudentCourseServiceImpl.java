@@ -211,8 +211,8 @@ public class StudentCourseServiceImpl implements StudentCourseService {
     //学生选课
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Result selectCourse(Long courseId, Long studentId) {
-
+    public Result selectCourse(Long courseId) {
+        Long studentId = getCurrentStudentId();
         String remainKey = RedisKeyUtils.getCourseRemainKey(courseId);
         String pointKey = RedisKeyUtils.getStudentPointKey(studentId);
         String coursePointKey = RedisKeyUtils.getCoursePointKey(courseId);
@@ -278,15 +278,15 @@ public class StudentCourseServiceImpl implements StudentCourseService {
             long scaledRequired = PointUtils.scaleUp(requiredPoints);
 
             // 检查积分是否足够
-//            Object scaledPointObj = redisTemplate.opsForValue().get(pointKey);
-//            Long scaledPoint = scaledPointObj != null ? ((Number) scaledPointObj).longValue() : null;
-//            if (scaledPoint == null || scaledPoint < scaledRequired) {
-//                // 积分不足，回滚名额
-//
-//                redisTemplate.opsForValue().increment(remainKey);
-//                BigDecimal actualPoint = PointUtils.scaleDown(scaledPoint);
-//                return Result.fail("积分不足：需" + requiredPoints + "，当前" + actualPoint);
-//            }
+            Object scaledPointObj = redisTemplate.opsForValue().get(pointKey);
+            Long scaledPoint = scaledPointObj != null ? ((Number) scaledPointObj).longValue() : null;
+            if (scaledPoint == null || scaledPoint < scaledRequired) {
+                // 积分不足，回滚名额
+
+                redisTemplate.opsForValue().increment(remainKey);
+                BigDecimal actualPoint = PointUtils.scaleDown(scaledPoint);
+                return Result.fail("积分不足：需" + requiredPoints + "，当前" + actualPoint);
+            }
 
             // 5 记录选课信息
             Selection selection = new Selection();
