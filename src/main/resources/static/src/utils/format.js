@@ -50,7 +50,7 @@ export const formatCourseStatus = (status) => {
     if (!status) return { text: '未知状态', type: 'warning' }
 
     const statusMap = {
-        published: { text: '可选课', type: 'success' },
+        published: { text: '竞价中', type: 'success' },
         closed: { text: '已结束', type: 'danger' },
         draft: { text: '未发布', type: 'info' }
     }

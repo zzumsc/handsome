@@ -6,6 +6,8 @@ import org.example.handsome.pojo.DTO.Result;
 import org.example.handsome.service.AdminCourseService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/admin/courses")
 public class AdminCourseController {
@@ -36,20 +38,32 @@ public class AdminCourseController {
     public Result updateCourse(
             @PathVariable Long id,
             @RequestBody Course course) {
-        course.setId(id); // 确保ID一致
+        course.setId(id);
         return courseService.updateCourse(course);
     }
 
-    // 开始选课（发布课程）
+    // 单个开始选课（发布课程）
     @PutMapping("/{id}/start")
     public Result startCourseSelection(@PathVariable Long id) {
         return courseService.startCourseSelection(id);
     }
 
-    // 结束选课
+    // 单个结束选课
     @PutMapping("/{id}/end")
     public Result endCourseSelection(@PathVariable Long id) {
         return courseService.endCourseSelection(id);
+    }
+
+    // 批量开始选课
+    @PutMapping("/batch/start")
+    public Result batchStartCourseSelection(@RequestBody List<Long> courseIds) {
+        return courseService.batchStartCourseSelection(courseIds);
+    }
+
+    // 批量结束选课
+    @PutMapping("/batch/end")
+    public Result batchEndCourseSelection(@RequestBody List<Long> courseIds) {
+        return courseService.batchEndCourseSelection(courseIds);
     }
 
     // 按课程ID查询选课学生
@@ -62,7 +76,7 @@ public class AdminCourseController {
     @GetMapping
     public Result getAllCourses(
             @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "20") Integer size,
             @RequestParam(required = false) String keyword) {
         return courseService.getAllCourses(page, size, keyword);
     }

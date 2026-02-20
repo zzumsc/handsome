@@ -10,6 +10,10 @@ public class UserQuery {
     private String role;
     private String email;
 
+    // 分页参数
+    private Integer page;
+    private Integer size;
+
     // 排序参数
     private String sortField;
     private String sortDir;
@@ -25,6 +29,28 @@ public class UserQuery {
         this.role = role;
         this.sortField = sortField;
         this.sortDir = sortDir;
+    }
+
+    /** 计算SQL OFFSET值 */
+    public int getOffset() {
+        if (page == null || size == null) return 0;
+        return (page - 1) * size;
+    }
+
+    public Integer getPage() {
+        return page;
+    }
+
+    public void setPage(Integer page) {
+        this.page = page;
+    }
+
+    public Integer getSize() {
+        return size;
+    }
+
+    public void setSize(Integer size) {
+        this.size = size;
     }
 
     public String getNo() {

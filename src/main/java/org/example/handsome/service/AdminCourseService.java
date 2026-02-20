@@ -3,6 +3,8 @@ package org.example.handsome.service;
 import org.example.handsome.pojo.Course;
 import org.example.handsome.pojo.DTO.Result;
 
+import java.util.List;
+
 public interface AdminCourseService {
     // 新增课程
     Result addCourse(Course course);
@@ -16,15 +18,21 @@ public interface AdminCourseService {
     // 更新课程信息
     Result updateCourse(Course course);
 
-    // 开始选课（draft->published）
+    // 单个开始选课
     Result startCourseSelection(Long courseId);
 
-    // 结束选课（published->closed）
+    // 单个结束选课
     Result endCourseSelection(Long courseId);
 
-    // 按课程ID查询所有选课学生
+    // 批量开始选课
+    Result batchStartCourseSelection(List<Long> courseIds);
+
+    // 批量结束选课（同步更新状态，异步单线程结算 + MQ入库）
+    Result batchEndCourseSelection(List<Long> courseIds);
+
+    // 按课程ID查询所有选课/竞价学生
     Result getStudentsByCourseId(Long courseId);
 
-
+    // 分页查询所有课程（管理员视角）
     Result getAllCourses(Integer page, Integer size, String keyword);
 }

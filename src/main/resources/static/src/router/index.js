@@ -13,7 +13,6 @@ const Login = () => import('../views/Login.vue')
 // 管理员页面
 const AdminUserManage = () => import('../views/admin/UserManage.vue')
 const AdminCourseManage = () => import('../views/admin/CourseManage.vue')
-const AdminCourseStudents = () => import('../views/admin/CourseStudents.vue')
 
 // 学生页面
 const StudentProfile = () => import('../views/student/Profile.vue')
@@ -43,8 +42,7 @@ export const router = createRouter({
             meta: { requiresAuth: true, role: 'admin' },
             children: [
                 { path: 'user-manage', name: 'AdminUserManage', component: AdminUserManage }, // 对应CrudController
-                { path: 'course-manage', name: 'AdminCourseManage', component: AdminCourseManage }, // 对应AdminCourseController
-                { path: 'course-students/:id', name: 'AdminCourseStudents', component: AdminCourseStudents } // 对应AdminCourseController的/students接口
+                { path: 'course-manage', name: 'AdminCourseManage', component: AdminCourseManage } // 对应AdminCourseController
             ]
         },
 

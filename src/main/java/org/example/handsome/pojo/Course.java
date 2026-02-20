@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -24,12 +25,14 @@ public class Course {
 
     private int currentStudents;
 
-    private BigDecimal initialPoints;
+    /** 上一年该课程最低录取积分（仅供参考展示） */
+    private BigDecimal lastYearScore;
 
-    private BigDecimal currentPoints;
+    /** 计划开始选课时间 */
+    private LocalDateTime startTime;
 
-    @Transient // @Transient 表示该字段不映射数据库列
-    private BigDecimal weight;
+    /** 计划结束选课时间 */
+    private LocalDateTime endTime;
 
     @Enumerated(EnumType.STRING)
     private CourseStatus status = CourseStatus.draft;
@@ -37,17 +40,23 @@ public class Course {
     @Version
     private Integer version = 0;
 
+    /** 当前竞价人数（瞬态字段，从Redis读取，不映射数据库） */
+    @Transient
+    private int bidCount;
+
     public enum CourseStatus {
         draft,    // 草稿（未发布）
         published,// 已发布（可选课）
         closed    // 已结束（不可选课）
     }
 
-
     public Course() {
     }
 
-    public Course(Long id, String courseCode, String name, String teacherName, int credit, int maxStudents, int currentStudents, BigDecimal initialPoints, BigDecimal currentPoints, BigDecimal weight, CourseStatus status, Integer version) {
+    public Course(Long id, String courseCode, String name, String teacherName, int credit,
+                  int maxStudents, int currentStudents, BigDecimal lastYearScore,
+                  LocalDateTime startTime, LocalDateTime endTime,
+                  CourseStatus status, Integer version) {
         this.id = id;
         this.courseCode = courseCode;
         this.name = name;
@@ -55,15 +64,19 @@ public class Course {
         this.credit = credit;
         this.maxStudents = maxStudents;
         this.currentStudents = currentStudents;
-        this.initialPoints = initialPoints;
-        this.currentPoints = currentPoints;
-        this.weight = weight;
+        this.lastYearScore = lastYearScore;
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.status = status;
         this.version = version;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getCourseCode() {
@@ -98,12 +111,28 @@ public class Course {
         this.teacherName = teacherName;
     }
 
-    public BigDecimal getInitialPoints() {
-        return initialPoints;
+    public BigDecimal getLastYearScore() {
+        return lastYearScore;
     }
 
-    public void setInitialPoints(BigDecimal initialPoints) {
-        this.initialPoints = initialPoints;
+    public void setLastYearScore(BigDecimal lastYearScore) {
+        this.lastYearScore = lastYearScore;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     public int getMaxStudents() {
@@ -120,14 +149,6 @@ public class Course {
 
     public void setCurrentStudents(int currentStudents) {
         this.currentStudents = currentStudents;
-    }
-
-    public BigDecimal getCurrentPoints() {
-        return currentPoints;
-    }
-
-    public void setCurrentPoints(BigDecimal currentPoints) {
-        this.currentPoints = currentPoints;
     }
 
     public CourseStatus getStatus() {
@@ -148,5 +169,13 @@ public class Course {
 
     public void setVersion(int version) {
         this.version = version;
+    }
+
+    public int getBidCount() {
+        return bidCount;
+    }
+
+    public void setBidCount(int bidCount) {
+        this.bidCount = bidCount;
     }
 }

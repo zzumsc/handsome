@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
 @EnableTransactionManagement
-//@EnableScheduling
+@EnableScheduling
 public class HandsomeApplication {
 
     public static void main(String[] args) {

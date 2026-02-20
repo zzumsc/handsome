@@ -59,6 +59,24 @@ export const getStudentsByCourseId = (id) => {
 }
 
 
+export const batchStartCourseSelection = (courseIds) => {
+    return request({
+        url: '/admin/courses/batch/start',
+        method: 'PUT',
+        data: courseIds
+    })
+}
+
+
+export const batchEndCourseSelection = (courseIds) => {
+    return request({
+        url: '/admin/courses/batch/end',
+        method: 'PUT',
+        data: courseIds
+    })
+}
+
+
 export const getAllCourses = (params) => {
     return request({
         url: '/admin/courses',

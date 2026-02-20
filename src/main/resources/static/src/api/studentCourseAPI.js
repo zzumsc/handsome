@@ -1,7 +1,7 @@
 import request from '../utils/request'
 
 /**
- * 1. 获取可选课程列表（对应后端 GET /student/courses）
+ * 1. 获取可选课程列表（含竞价人数、往年录取分）
  */
 export const listAvailableCourses = () => {
     return request({
@@ -11,29 +11,55 @@ export const listAvailableCourses = () => {
 }
 
 /**
- * 2. 选课操作（对应后端 POST /student/courses/{courseId}/select）
+ * 2. 竞价预选课程
  * @param {number} courseId - 课程ID
+ * @param {number} bidPoints - 投入积分
  */
-export const selectCourse = (courseId) => {
+export const bidCourse = (courseId, bidPoints) => {
     return request({
-        url: `/student/courses/${courseId}/select`,
-        method: 'POST'
+        url: `/student/courses/${courseId}/bid`,
+        method: 'POST',
+        data: { bidPoints }
     })
 }
 
 /**
- * 3. 退课操作（对应后端 POST /student/courses/{courseId}/drop）
+ * 3. 修改竞价积分
  * @param {number} courseId - 课程ID
+ * @param {number} bidPoints - 新投入积分
  */
-export const dropCourse = (courseId) => {
+export const updateBid = (courseId, bidPoints) => {
     return request({
-        url: `/student/courses/${courseId}/drop`,
-        method: 'POST'
+        url: `/student/courses/${courseId}/bid`,
+        method: 'PUT',
+        data: { bidPoints }
     })
 }
 
 /**
- * 4. 获取学生已选课程（对应后端 GET /student/selections）
+ * 4. 取消预选（全额退还积分）
+ * @param {number} courseId - 课程ID
+ */
+export const cancelBid = (courseId) => {
+    return request({
+        url: `/student/courses/${courseId}/bid`,
+        method: 'DELETE'
+    })
+}
+
+/**
+ * 5. 查询我在某课程的竞价信息
+ * @param {number} courseId - 课程ID
+ */
+export const getMyBid = (courseId) => {
+    return request({
+        url: `/student/courses/${courseId}/bid`,
+        method: 'GET'
+    })
+}
+
+/**
+ * 6. 获取学生已录取课程（结算后的选课记录）
  */
 export const getMySelections = () => {
     return request({
