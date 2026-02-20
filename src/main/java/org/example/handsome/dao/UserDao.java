@@ -38,10 +38,10 @@ public interface UserDao {
     @Select("<script>" +
             "SELECT id, email, name, role, no FROM users " +
             "WHERE 1=1 " +
-            "<if test='name != null and name != \"\"'>AND name LIKE CONCAT('%', #{name}, '%')</if>" +
-            "<if test='email != null and email != \"\"'>AND email LIKE CONCAT('%', #{email}, '%')</if>" +
-            "<if test='no != null and no != \"\"'>AND no LIKE CONCAT('%', #{no}, '%')</if>" +
-            "<if test='role != null and role != \"\"'>AND role = #{role}</if>" +
+            "<if test='name != null and name != \"\"'> AND name LIKE CONCAT('%', #{name}, '%') </if>" +
+            "<if test='email != null and email != \"\"'> AND email LIKE CONCAT('%', #{email}, '%') </if>" +
+            "<if test='no != null and no != \"\"'> AND no LIKE CONCAT('%', #{no}, '%') </if>" +
+            "<if test='role != null and role != \"\"'> AND role = #{role} </if>" +
             "<choose>" +
             "   <when test='sortField != null and sortField != \"\" and sortDir != null and sortDir != \"\"'>" +
             "       ORDER BY ${sortField} ${sortDir}" +
@@ -50,9 +50,29 @@ public interface UserDao {
             "       ORDER BY id ASC" +
             "   </otherwise>" +
             "</choose>" +
+            " LIMIT #{offset}, #{size}" +
             "</script>")
     List<User> selectByCondition(UserQuery query);
 
+    @Select("<script>" +
+            "SELECT COUNT(*) FROM users " +
+            "WHERE 1=1 " +
+            "<if test='name != null and name != \"\"'> AND name LIKE CONCAT('%', #{name}, '%') </if>" +
+            "<if test='email != null and email != \"\"'> AND email LIKE CONCAT('%', #{email}, '%') </if>" +
+            "<if test='no != null and no != \"\"'> AND no LIKE CONCAT('%', #{no}, '%') </if>" +
+            "<if test='role != null and role != \"\"'> AND role = #{role} </if>" +
+            "</script>")
+    int countByCondition(UserQuery query);
+
+
+    // 根据ID列表批量查询用户
+    @Select("<script>" +
+            "SELECT id, email, name, role, no FROM users WHERE id IN " +
+            "<foreach collection='ids' item='id' open='(' separator=',' close=')'>" +
+            "#{id}" +
+            "</foreach>" +
+            "</script>")
+    List<User> selectByIds(@Param("ids") List<Long> ids);
 
     // 根据邮箱查询用户
     @Select("SELECT id, email, name, role, no FROM users WHERE email = #{username}")

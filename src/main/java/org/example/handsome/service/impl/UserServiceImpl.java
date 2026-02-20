@@ -114,10 +114,10 @@ public class UserServiceImpl implements UserService {
             return Result.fail("邮箱格式错误！");
         }
         // 从Redis获取验证码
-//        String redisCode = stringRedisTemplate.opsForValue().get(LOGIN_CODE_KEY + email);
-//        if (redisCode == null || !redisCode.equals(code)) {
-//            return Result.fail("验证码错误或已过期");
-//        }
+        String redisCode = stringRedisTemplate.opsForValue().get(LOGIN_CODE_KEY + email);
+        if (redisCode == null || !redisCode.equals(code)) {
+            return Result.fail("验证码错误或已过期");
+        }
 
         // 用 MyBatis Mapper 查询用户
         User user = loginDao.selectByEmail(email);

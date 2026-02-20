@@ -14,42 +14,35 @@ public interface SelectionDao {
             "s.selection_time AS s_selectionTime, s.points_used AS s_pointsUsed, " +
             "u.id AS u_id, u.name AS u_name, u.no AS u_no, u.email AS u_email, u.role AS u_role, " +
             "c.id AS c_id, c.course_code AS c_courseCode, c.name AS c_name, c.status AS c_status, " +
-            "c.teacher_name AS c_teacherName, c.credit AS c_credit, c.current_points AS c_currentPoints, " +
+            "c.teacher_name AS c_teacherName, c.credit AS c_credit, c.last_year_score AS c_lastYearScore, " +
             "c.current_students AS c_currentStudents, c.max_students AS c_maxStudents " +
             "FROM selections s " +
             "LEFT JOIN users u ON s.student_id = u.id " +
             "LEFT JOIN courses c ON s.course_id = c.id " +
-            // 动态条件：studentId不为null时，添加WHERE筛选
             "<if test='studentId != null'>" +
             "WHERE s.student_id = #{studentId}" +
             "</if>" +
             "</script>")
     @Results({
-            // 映射选课表字段
             @Result(column = "s_id", property = "id"),
             @Result(column = "s_studentId", property = "studentId"),
             @Result(column = "s_courseId", property = "courseId"),
             @Result(column = "s_selectionTime", property = "selectionTime"),
             @Result(column = "s_pointsUsed", property = "pointsUsed"),
-
-            // 映射关联的学生信息（User对象）
             @Result(column = "u_id", property = "student.id"),
             @Result(column = "u_name", property = "student.name"),
             @Result(column = "u_no", property = "student.no"),
             @Result(column = "u_email", property = "student.email"),
             @Result(column = "u_role", property = "student.role"),
-
-            // 映射关联的课程信息（Course对象）
             @Result(column = "c_id", property = "course.id"),
             @Result(column = "c_courseCode", property = "course.courseCode"),
             @Result(column = "c_name", property = "course.name"),
             @Result(column = "c_teacherName", property = "course.teacherName"),
             @Result(column = "c_credit", property = "course.credit"),
-            @Result(column = "c_currentPoints", property = "course.currentPoints"),
+            @Result(column = "c_lastYearScore", property = "course.lastYearScore"),
             @Result(column = "c_status", property = "course.status"),
             @Result(column = "c_currentStudents", property = "course.currentStudents"),
             @Result(column = "c_maxStudents", property = "course.maxStudents")
-
     })
     List<Selection> selectByStudentId(Long studentId);
 
@@ -60,11 +53,9 @@ public interface SelectionDao {
             "LEFT JOIN users u ON s.student_id = u.id " +
             "WHERE s.course_id = #{courseId}")
     @Results({
-            // 选课记录字段
             @Result(column = "s_id", property = "id"),
             @Result(column = "s_selectionTime", property = "selectionTime"),
             @Result(column = "s_pointsUsed", property = "pointsUsed"),
-            // 学生信息字段
             @Result(column = "u_id", property = "student.id"),
             @Result(column = "u_name", property = "student.name"),
             @Result(column = "u_no", property = "student.no"),
@@ -72,6 +63,10 @@ public interface SelectionDao {
             @Result(column = "u_role", property = "student.role")
     })
     List<Selection> selectStudentsByCourseId(Long courseId);
+
+    // 查询课程已录取的学生ID列表（轻量级，用于Redis预加载）
+    @Select("SELECT student_id FROM selections WHERE course_id = #{courseId}")
+    List<Long> selectAdmittedStudentIds(Long courseId);
 
     // 检查学生是否已选该课程
     @Select("SELECT COUNT(1) FROM selections WHERE student_id = #{studentId} AND course_id = #{courseId}")
@@ -87,15 +82,12 @@ public interface SelectionDao {
             @Param("courseId") Long courseId
     );
 
-    @Select("select max_students-current_students from courses where id= #{courseId}")
-    int remainStudents(@Param("courseId")Long courseId);
-
     @Insert("INSERT INTO selections (" +
             "student_id, course_id, selection_time, points_used" +
             ") VALUES (" +
             "#{studentId}, #{courseId}, #{selectionTime}, #{pointsUsed}" +
             ")")
-    @Options(useGeneratedKeys = true, keyProperty = "id") // 返回自增ID
+    @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(Selection selection);
 
     @Select("SELECT * FROM selections " +
@@ -111,4 +103,13 @@ public interface SelectionDao {
             @Param("studentId") Long studentId,
             @Param("courseId") Long courseId
     );
+
+    // 结算时：批量插入录取的选课记录
+    @Insert("<script>" +
+            "INSERT INTO selections (student_id, course_id, selection_time, points_used) VALUES " +
+            "<foreach collection='selections' item='s' separator=','>" +
+            "(#{s.studentId}, #{s.courseId}, #{s.selectionTime}, #{s.pointsUsed})" +
+            "</foreach>" +
+            "</script>")
+    int batchInsert(@Param("selections") List<Selection> selections);
 }

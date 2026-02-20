@@ -7,8 +7,6 @@ import org.example.handsome.dao.UserDao;
 import org.example.handsome.pojo.DTO.Result;
 import org.example.handsome.pojo.User;
 import org.example.handsome.service.StudentService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -74,27 +72,21 @@ public class StudentServiceImpl implements StudentService {
     @Resource
     StudentPointDao studentPointDao;
 
-    @Autowired
-    RedisTemplate<String, Object> redisTemplate;
-
     @Override
     public Result getMyPoints() {
-        try{
-            // 1. 获取当前登录用户的身份信息
+        try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            String loginEmail = auth.getName(); // 假设登录账号是邮箱
+            String loginEmail = auth.getName();
 
-            // 2. 根据邮箱查询用户信息（需包含 student_id）
             User loginUser = userDao.selectByEmail(loginEmail);
             if (loginUser == null || loginUser.getId() == null) {
                 throw new RuntimeException("用户信息异常，无法获取学生ID");
             }
 
-            // 3. 根据学生ID查询积分
             Long studentId = loginUser.getId();
-            return Result.ok("获取积分成功").put("point",studentPointDao.getStudentPoints(studentId,redisTemplate));
-        }
-        catch (Exception e) {
+            return Result.ok("获取积分成功")
+                    .put("point", studentPointDao.getStudentPointsFromDb(studentId));
+        } catch (Exception e) {
             log.error("获取学生积分失败", e);
             return Result.fail("获取积分失败，请稍后重试");
         }

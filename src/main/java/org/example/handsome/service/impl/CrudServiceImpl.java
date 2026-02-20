@@ -95,19 +95,17 @@ public class CrudServiceImpl implements CrudService {
         // 验证排序字段的合法性，防止SQL注入
         validateSortField(query);
 
-        List<User> users = userDao.selectByCondition(query);
+        // 分页参数默认值
+        if (query.getPage() == null || query.getPage() < 1) {
+            query.setPage(1);
+        }
+        if (query.getSize() == null || query.getSize() < 1) {
+            query.setSize(20);
+        }
 
-        // 如果需要分页处理
-        int total = users.size();
-        /*if (query.getPage() != null && query.getSize() != null) {
-            int start = (query.getPage() - 1) * query.getSize();
-            int end = Math.min(start + query.getSize(), total);
-            if (start < end) {
-                users = users.subList(start, end);
-            } else {
-                users = new ArrayList<>();
-            }
-        }*/
+        // SQL层分页查询 + 总数查询
+        List<User> users = userDao.selectByCondition(query);
+        int total = userDao.countByCondition(query);
 
         return Result.ok("查询成功")
                 .put("users", users)
